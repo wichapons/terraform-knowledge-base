@@ -2,33 +2,45 @@ resource "aws_security_group" "this" {
   name        = var.name
   description = var.description
   vpc_id      = var.vpc_id
-
-  dynamic "ingress" {
-    for_each = var.ingress_rules
-    content {
-      from_port   = ingress.value.from_port
-      to_port     = ingress.value.to_port
-      protocol    = ingress.value.protocol
-      cidr_blocks = lookup(ingress.value, "cidr_blocks", [])
-      ipv6_cidr_blocks = lookup(ingress.value, "ipv6_cidr_blocks", [])
-      security_groups  = lookup(ingress.value, "security_groups", [])
-      description = lookup(ingress.value, "description", null)
-    }
-  }
-
-  dynamic "egress" {
-    for_each = var.egress_rules
-    content {
-      from_port   = egress.value.from_port
-      to_port     = egress.value.to_port
-      protocol    = egress.value.protocol
-      cidr_blocks = lookup(egress.value, "cidr_blocks", [])
-      ipv6_cidr_blocks = lookup(egress.value, "ipv6_cidr_blocks", [])
-      description = lookup(egress.value, "description", null)
-    }
-  }
-
   tags = merge(var.tags, {
     Name = var.name
   })
+}
+
+# Manage ingress rules as separate resources for better tracking
+resource "aws_security_group_rule" "ingress" {
+  count = length(var.ingress_rules)
+
+  type              = var.ingress_rules[count.index].type
+  protocol          = var.ingress_rules[count.index].protocol
+  from_port         = var.ingress_rules[count.index].from_port
+  to_port           = var.ingress_rules[count.index].to_port
+  security_group_id = aws_security_group.this.id
+
+  # Handle different source types
+  cidr_blocks              = length(coalesce(var.ingress_rules[count.index].cidr_blocks, [])) > 0 ? var.ingress_rules[count.index].cidr_blocks : null
+  ipv6_cidr_blocks        = length(coalesce(var.ingress_rules[count.index].ipv6_cidr_blocks, [])) > 0 ? var.ingress_rules[count.index].ipv6_cidr_blocks : null
+  source_security_group_id = var.ingress_rules[count.index].source_security_group_id != "" ? var.ingress_rules[count.index].source_security_group_id : null
+  prefix_list_ids         = length(coalesce(var.ingress_rules[count.index].prefix_list_ids, [])) > 0 ? var.ingress_rules[count.index].prefix_list_ids : null
+
+  description = var.ingress_rules[count.index].description
+}
+
+# Manage egress rules as separate resources for better tracking
+resource "aws_security_group_rule" "egress" {
+  count = length(var.egress_rules)
+
+  type              = var.egress_rules[count.index].type
+  protocol          = var.egress_rules[count.index].protocol
+  from_port         = var.egress_rules[count.index].from_port
+  to_port           = var.egress_rules[count.index].to_port
+  security_group_id = aws_security_group.this.id
+
+  # Handle different source types
+  cidr_blocks              = length(coalesce(var.egress_rules[count.index].cidr_blocks, [])) > 0 ? var.egress_rules[count.index].cidr_blocks : null
+  ipv6_cidr_blocks        = length(coalesce(var.egress_rules[count.index].ipv6_cidr_blocks, [])) > 0 ? var.egress_rules[count.index].ipv6_cidr_blocks : null
+  source_security_group_id = var.egress_rules[count.index].source_security_group_id != "" ? var.egress_rules[count.index].source_security_group_id : null
+  prefix_list_ids         = length(coalesce(var.egress_rules[count.index].prefix_list_ids, [])) > 0 ? var.egress_rules[count.index].prefix_list_ids : null
+
+  description = var.egress_rules[count.index].description
 }

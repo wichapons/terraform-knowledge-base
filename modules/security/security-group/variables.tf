@@ -13,32 +13,41 @@ variable "vpc_id" {
 
 variable "ingress_rules" {
   type = list(object({
-    from_port       = number
-    to_port         = number
-    protocol        = string
-    cidr_blocks     = optional(list(string), [])
-    ipv6_cidr_blocks = optional(list(string), [])
-    security_groups = optional(list(string), [])
-    description     = optional(string)
+    type                     = string
+    from_port               = number
+    to_port                 = number
+    protocol                = string
+    cidr_blocks             = optional(list(string))
+    ipv6_cidr_blocks        = optional(list(string))
+    source_security_group_id = optional(string, "")
+    prefix_list_ids         = optional(list(string))
+    description             = optional(string)
   }))
   default = []
+  description = "List of ingress rules for the security group"
 }
 
 variable "egress_rules" {
   type = list(object({
-    from_port       = number
-    to_port         = number
-    protocol        = string
-    cidr_blocks     = optional(list(string), [])
-    ipv6_cidr_blocks = optional(list(string), [])
-    description     = optional(string)
+    type                     = string
+    from_port               = number
+    to_port                 = number
+    protocol                = string
+    cidr_blocks             = optional(list(string))
+    ipv6_cidr_blocks        = optional(list(string))
+    source_security_group_id = optional(string, "")
+    prefix_list_ids         = optional(list(string))
+    description             = optional(string)
   }))
   default = [{
-    from_port = 0
-    to_port   = 0
-    protocol  = "-1"
+    type        = "egress"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow all outbound traffic"
   }]
+  description = "List of egress rules for the security group"
 }
 
 variable "tags" {

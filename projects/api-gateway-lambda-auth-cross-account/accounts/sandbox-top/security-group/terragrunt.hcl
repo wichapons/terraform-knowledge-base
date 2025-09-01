@@ -31,6 +31,23 @@ inputs = {
   name        = "${local.project}-${local.environment}-sg"
   description = "Security group for sandbox-top services"
   vpc_id      = dependency.vpc.outputs.vpc_id
-  ingress_rules = []
+
+  # Ingress rules
+  ingress_rules = [
+
+  ]
+  
+  # Egress rules
+  egress_rules = [
+    {
+      type        = "egress"
+      from_port   = 0
+      to_port     = 0
+      protocol    = "-1"
+      cidr_blocks = ["0.0.0.0/0"]
+      description = "Allow all outbound traffic"
+    }
+  ]
+  
   tags = local.module_tags
 }
