@@ -34,8 +34,16 @@ dependency "sg" {
   
 }
 
+dependency "iam_role" {
+  config_path = "../../iam-role"
+  
+  mock_outputs = {
+    instance_profile_name = "mock-instance-profile"
+  }
+}
+
 dependencies {
-  paths = ["../../vpc", "../../security-group"]
+  paths = ["../../vpc", "../../security-group", "../../iam-role"]
 }
 
 
@@ -57,6 +65,9 @@ inputs = {
 
   # Security group created in sibling stack
   security_group_ids = [dependency.sg.outputs.security_group_id]
+
+  # IAM instance profile for SSM access
+  iam_instance_profile = dependency.iam_role.outputs.instance_profile_name
 
   key_name = ""
 
