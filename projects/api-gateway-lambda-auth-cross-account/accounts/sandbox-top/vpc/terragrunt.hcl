@@ -6,7 +6,7 @@ locals {
   common_tags       = local.common_vars.inputs.tags
   
   # Define local variables
-  project           = "api-gateway-lambda-auth"
+  project           = local.common_vars.inputs.project
   environment       = local.common_tags.environment
   region           = local.aws_configuration.region
   

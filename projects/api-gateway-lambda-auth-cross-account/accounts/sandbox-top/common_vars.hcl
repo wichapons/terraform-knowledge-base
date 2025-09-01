@@ -5,6 +5,8 @@ inputs = {
     "skip_region_validation"  = true
   }
   
+  project = "api-gateway-lambda-auth"
+  
   # Account-specific tags
   tags = {
     "environment"    = "dev"

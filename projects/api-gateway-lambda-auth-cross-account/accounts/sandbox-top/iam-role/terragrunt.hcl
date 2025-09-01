@@ -3,8 +3,7 @@ locals {
 
   aws_configuration = local.common_vars.inputs.aws_configuration
   common_tags       = local.common_vars.inputs.tags
-
-  project     = "api-gateway-lambda-auth"
+  project     = local.common_vars.inputs.project
   environment = local.common_tags.environment
   region      = local.aws_configuration.region
 
