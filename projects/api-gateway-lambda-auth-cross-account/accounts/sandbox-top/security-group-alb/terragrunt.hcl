@@ -8,12 +8,13 @@ locals {
   environment = local.common_tags.environment
   region      = local.aws_configuration.region
 
-  module_tags = merge(local.common_tags, { "module" = "security-group" })
+  module_tags = merge(local.common_tags, { "module" = "security-group-alb" })
 }
 
 terraform {
   source = "../../../../../modules/security/security-group"
 }
+
 dependency "vpc" {
   config_path = "../vpc"
   
@@ -23,28 +24,29 @@ dependency "vpc" {
   
 }
 
+
 dependencies {
   paths = ["../vpc"]
 }
 
 inputs = {
-  name        = "${local.project}-${local.environment}-sg"
-  description = "Security group for sandbox-top services"
+  name        = "${local.project}-${local.environment}-sg-alb"
+  description = "Security group for Application Load Balancer (HTTP)"
   vpc_id      = dependency.vpc.outputs.vpc_id
 
-  # Ingress rules
+  # Ingress rules - allow HTTP from anywhere
   ingress_rules = [
     {
-        type = "ingress"
-        from_port = 80
-        to_port = 80
-        protocol = "tcp"
-        cidr_blocks = ["0.0.0.0/0"]
-        description = "Allow HTTP (80) from anywhere"
+      type        = "ingress"
+      from_port   = 80
+      to_port     = 80
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+      description = "Allow HTTP (80) from anywhere to ALB"
     }
   ]
   
-  # Egress rules
+  # Egress rules - allow all outbound
   egress_rules = [
     {
       type        = "egress"
