@@ -1,0 +1,1 @@
+This project demonstrates how to set up an API Gateway with Lambda authorizers which are located in another account. The architecture involves cross-account IAM roles and resource policies to allow the API Gateway to invoke the Lambda functions securely.
