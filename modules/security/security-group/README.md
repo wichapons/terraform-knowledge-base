@@ -15,7 +15,7 @@ Example usage:
 
 ```hcl
 module "web_sg" {
-  source = "../../modules/compute/security_group"
+  source = "../../modules/security/security-group"
   name   = "web-sg"
   vpc_id = module.vpc.vpc_id
   ingress_rules = [

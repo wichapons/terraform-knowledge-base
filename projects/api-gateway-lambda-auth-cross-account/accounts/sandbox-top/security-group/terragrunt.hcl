@@ -12,7 +12,7 @@ locals {
 }
 
 terraform {
-  source = "../../../../../modules/compute/security_group"
+  source = "../../../../../modules/security/security-group"
 }
 dependency "vpc" {
   config_path = "../vpc"
