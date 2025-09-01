@@ -54,3 +54,9 @@ variable "root_volume_type" {
   type    = string
   default = "gp3"
 }
+
+variable "iam_instance_profile" {
+  type        = string
+  description = "Name of the IAM instance profile to attach to the EC2 instance"
+  default     = ""
+}
