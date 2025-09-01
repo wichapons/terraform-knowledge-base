@@ -46,9 +46,6 @@ dependencies {
   paths = ["../../vpc", "../../security-group", "../../iam-role"]
 }
 
-
-# Note: you must provide a valid AMI id for your region. Replace the empty string or
-# inject an `ami` via a parent `common_vars.hcl` if you want to centralize it.
 inputs = {
   project       = local.project
   environment   = local.environment
@@ -63,7 +60,7 @@ inputs = {
   # No public IP on private subnet
   associate_public_ip = false
 
-  # Security group created in sibling stack
+  # Security group
   security_group_ids = [dependency.sg.outputs.security_group_id]
 
   # IAM instance profile for SSM access
@@ -71,7 +68,7 @@ inputs = {
 
   key_name = ""
 
-  user_data = ""
+  user_data = file("${get_terragrunt_dir()}/install-nginx.sh")
 
   tags = local.module_tags
 }
