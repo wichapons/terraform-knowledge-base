@@ -47,12 +47,22 @@ dependencies {
 
 inputs = {
   name            = "${local.project}-${local.environment}-nlb"
-  internal        = false  
-  subnet_ids      = dependency.vpc.outputs.public_subnet_ids
+  internal        = true 
   vpc_id          = dependency.vpc.outputs.vpc_id
   security_groups = [dependency.security_group.outputs.security_group_id]
 
   enable_deletion_protection = false
+
+  subnet_mapping = [
+    {
+      subnet_id            = dependency.vpc.outputs.private_subnet_ids[0]
+      private_ipv4_address = "10.10.10.10"  # NLB Private IP 1
+    },
+    {
+      subnet_id            = dependency.vpc.outputs.private_subnet_ids[1]
+      private_ipv4_address = "10.10.11.11"  # NLB Private IP 2
+    }
+  ]
 
   target_groups = [
     {
