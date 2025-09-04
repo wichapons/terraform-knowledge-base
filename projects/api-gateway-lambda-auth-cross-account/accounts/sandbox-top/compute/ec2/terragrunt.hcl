@@ -50,9 +50,9 @@ inputs = {
   project       = local.project
   environment   = local.environment
 
-  ami           = "ami-0ee07f04ff2b54927" 
+  ami           = "ami-0779c82fbb81e731c" 
 
-  instance_type = "t3.micro"
+  instance_type = "t3.nano"
 
   # Use the first private subnet from the VPC dependency
   subnet_id     = dependency.vpc.outputs.private_subnet_ids[0]

@@ -19,7 +19,7 @@ server {
     # Root returns a simple text for ALB / external checks
     location = / {
         add_header Content-Type text/plain;
-        return 200 'hello topazio';
+        return 200 'hello world! from EC2-NGINX';
     }
 
     # ALB health check endpoint
