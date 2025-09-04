@@ -1,12 +1,12 @@
 inputs = {
   aws_configuration = {
     "profile" = "terraform-poc-top"
-    "region" = "ap-southeast-7"   
+    "region" = "ap-southeast-1"
     "skip_region_validation"  = true
   }
 
-  s3_bucket_name = "terraform-state-kb-trueidc" 
-  dynamodb_table_name = "terraform-dynamodb-lockid-kb-trueidc" 
+  s3_bucket_name = "terraform-state-kb-trueidc-th" 
+  dynamodb_table_name = "terraform-dynamodb-lockid-kb-trueidc-th" 
    
     tags = {
     "environment"    = "dev"

@@ -1,7 +1,7 @@
 inputs = {
   aws_configuration = {
     "profile" = "terraform-poc-top"
-    "region" = "ap-southeast-7"   
+    "region" = "ap-southeast-1"   
     "skip_region_validation"  = true
   }
   

@@ -50,7 +50,7 @@ inputs = {
   project       = local.project
   environment   = local.environment
 
-  ami           = "ami-0f458a6b68ce01b7a" 
+  ami           = "ami-0ee07f04ff2b54927" 
 
   instance_type = "t3.micro"
 
