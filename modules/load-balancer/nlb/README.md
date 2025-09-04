@@ -5,6 +5,7 @@ This Terraform module creates an AWS Network Load Balancer (NLB) with associated
 ## Features
 
 - Creates a Network Load Balancer (internal or internet-facing)
+- Support for private IP addresses on internal NLBs via subnet mapping
 - Supports multiple target groups with flexible configuration
 - Configurable health checks for target groups
 - Support for multiple listeners
@@ -74,7 +75,8 @@ module "nlb" {
 |------|-------------|------|---------|:--------:|
 | name | The name of the Network Load Balancer | `string` | n/a | yes |
 | internal | If true, the NLB will be internal | `bool` | `false` | no |
-| subnet_ids | A list of subnet IDs to attach to the NLB | `list(string)` | n/a | yes |
+| subnet_ids | A list of subnet IDs to attach to the NLB (used when subnet_mapping is not specified) | `list(string)` | `null` | no |
+| subnet_mapping | A list of subnet mapping blocks for internal NLBs with private IP addresses | `list(object)` | `null` | no |
 | security_groups | A list of security group IDs to assign to the NLB | `list(string)` | `null` | no |
 | vpc_id | VPC ID where the NLB will be created | `string` | n/a | yes |
 | enable_deletion_protection | If true, deletion of the load balancer will be disabled via the AWS API | `bool` | `false` | no |
@@ -83,6 +85,8 @@ module "nlb" {
 | target_attachments | A list of target attachments | `list(object)` | `[]` | no |
 | listeners | A list of listener configurations | `list(object)` | `[]` | no |
 | tags | A map of tags to assign to the resource | `map(string)` | `{}` | no |
+
+**Note:** You must specify either `subnet_ids` or `subnet_mapping`, but not both.
 
 ## Outputs
 
@@ -117,6 +121,60 @@ module "basic_nlb" {
       port        = 80
       protocol    = "TCP"
       target_type = "instance"
+    }
+  ]
+
+  listeners = [
+    {
+      port     = 80
+      protocol = "TCP"
+      default_action = {
+        type               = "forward"
+        target_group_index = 0
+      }
+    }
+  ]
+
+  tags = var.tags
+}
+```
+
+### Internal NLB with private IP addresses
+
+```hcl
+module "internal_nlb_with_private_ips" {
+  source = "./modules/load-balancer/nlb"
+
+  name     = "internal-nlb-private-ips"
+  internal = true
+  vpc_id   = var.vpc_id
+
+  subnet_mapping = [
+    {
+      subnet_id            = var.private_subnet_ids[0]
+      private_ipv4_address = "10.0.1.100"
+    },
+    {
+      subnet_id            = var.private_subnet_ids[1]
+      private_ipv4_address = "10.0.2.100"
+    }
+  ]
+
+  target_groups = [
+    {
+      name        = "app-servers"
+      port        = 80
+      protocol    = "TCP"
+      target_type = "instance"
+      health_check = {
+        enabled             = true
+        healthy_threshold   = 2
+        interval            = 30
+        port                = "traffic-port"
+        protocol            = "TCP"
+        timeout             = 10
+        unhealthy_threshold = 2
+      }
     }
   ]
 

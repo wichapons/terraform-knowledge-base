@@ -10,8 +10,20 @@ variable "internal" {
 }
 
 variable "subnet_ids" {
-  description = "A list of subnet IDs to attach to the NLB"
+  description = "A list of subnet IDs to attach to the NLB (used when subnet_mapping is not specified)"
   type        = list(string)
+  default     = null
+}
+
+variable "subnet_mapping" {
+  description = "A list of subnet mapping blocks for internal NLBs with private IP addresses"
+  type = list(object({
+    subnet_id            = string
+    allocation_id        = optional(string)
+    ipv6_address         = optional(string)
+    private_ipv4_address = optional(string)
+  }))
+  default = null
 }
 
 variable "security_groups" {

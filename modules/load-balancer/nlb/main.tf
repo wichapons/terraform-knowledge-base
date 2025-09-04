@@ -1,11 +1,26 @@
+locals {
+  # Validation for subnet configuration
+  subnet_config_valid = (var.subnet_ids != null && var.subnet_mapping == null) || (var.subnet_ids == null && var.subnet_mapping != null)
+}
+
 resource "aws_lb" "this" {
   name               = var.name
   internal           = var.internal
   load_balancer_type = "network"
-  subnets            = var.subnet_ids
+  subnets            = var.subnet_mapping == null ? var.subnet_ids : null
   security_groups    = var.security_groups
 
   enable_deletion_protection = var.enable_deletion_protection
+
+  dynamic "subnet_mapping" {
+    for_each = var.subnet_mapping != null ? var.subnet_mapping : []
+    content {
+      subnet_id            = subnet_mapping.value.subnet_id
+      allocation_id        = lookup(subnet_mapping.value, "allocation_id", null)
+      ipv6_address         = lookup(subnet_mapping.value, "ipv6_address", null)
+      private_ipv4_address = lookup(subnet_mapping.value, "private_ipv4_address", null)
+    }
+  }
 
   dynamic "access_logs" {
     for_each = var.access_logs != null ? [var.access_logs] : []
@@ -19,6 +34,13 @@ resource "aws_lb" "this" {
   tags = merge(var.tags, {
     Name = var.name
   })
+
+  lifecycle {
+    precondition {
+      condition     = local.subnet_config_valid
+      error_message = "You must specify either subnet_ids or subnet_mapping, but not both."
+    }
+  }
 }
 
 resource "aws_lb_target_group" "this" {
